@@ -1,6 +1,3 @@
-# gameTheory_MiniGames
-A collection of Combinatorial Games with an unbeatable AI opponent. Built with Python and Pygame, utilizing Game Theory algorithms.
-
 # Combinatorial Games AI (NIM & Notakto)
 
 This repository contains the implementation of classic combinatorial games in Python. The project focuses on developing an artificial intelligence opponent capable of perfect-play, based strictly on game thery algorithms.
