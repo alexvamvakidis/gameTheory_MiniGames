@@ -30,3 +30,10 @@ The game AI implements the principles of Impartial Games, evaluating Winning and
 Dependency installation:
 ```bash
 pip install pygame
+
+Running the project:
+
+From the project root run the main menu (recommended):
+```bash
+python3 main_menu.py
+```
