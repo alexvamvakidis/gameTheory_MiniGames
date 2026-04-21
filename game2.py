@@ -105,6 +105,11 @@ def play_game2(screen):
                     valid_move = sticks[selected_col] >= i
                     pygame.draw.rect(screen, BLUE if valid_move else GRAY, btn, border_radius=5)
                     screen.blit(font_label.render(f"Remove {i}", True, WHITE), (btn.x + 15, btn.y + 10))
+            
+            # replay button
+            replay_btn = pygame.Rect(150, 20, 130, 40)
+            pygame.draw.rect(screen, GREEN, replay_btn, border_radius=5)
+            screen.blit(font_label.render("Replay", True, WHITE), (165, 25))
 
         back_btn = pygame.Rect(20, 20, 100, 40)
         pygame.draw.rect(screen, RED, back_btn, border_radius=5)
@@ -121,6 +126,11 @@ def play_game2(screen):
                         running_state = STATE_SETUP
                     else:
                         return 
+                
+                if running_state == STATE_PLAYING and replay_btn.collidepoint(m_pos):
+                    turn = "Player" if not pvp else "Green"
+                    winner, error_msg, pc_move_msg = None, "", ""
+                    sticks = [int(numSticks1), int(numSticks2), int(numSticks3)]
 
                 if running_state == STATE_SETUP:
                     pvc_btn = pygame.Rect(250, 210, 220, 60)

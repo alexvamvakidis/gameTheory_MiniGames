@@ -109,6 +109,11 @@ def play_game1(screen):
                     t_txt = font_label.render(f"Remove {i}", True, WHITE)
                     screen.blit(t_txt, t_txt.get_rect(center=btn.center))
 
+            # replay button
+            replay_btn = pygame.Rect(150, 20, 130, 40)
+            pygame.draw.rect(screen, GREEN, replay_btn, border_radius=5)
+            screen.blit(font_label.render("Replay", True, WHITE), (165, 25))
+
         # back button
         back_btn = pygame.Rect(20, 20, 100, 40)
         pygame.draw.rect(screen, RED, back_btn, border_radius=5)
@@ -125,6 +130,12 @@ def play_game1(screen):
                         running_state = STATE_SETUP
                     else:
                         return 
+             
+                if running_state == STATE_PLAYING and replay_btn.collidepoint(m_pos):
+                    turn = "Player" if not pvp else "Green"
+                    winner, error_msg = None, ""
+                    pc_move_msg = ""
+                    sticks = int(numSticks)
 
                 if running_state == STATE_SETUP:
                     if pvc_btn.collidepoint(m_pos): pvp = False
@@ -165,6 +176,8 @@ def play_game1(screen):
                                 else:
                                     turn = "Red" if turn == "Green" else "Green"
                                     pc_move_msg = ""
+                
+                
 
             if event.type == pygame.KEYDOWN and running_state == STATE_SETUP:
                 if active_box == 's':

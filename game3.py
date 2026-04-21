@@ -117,6 +117,12 @@ def play_game3(screen):
                         screen.blit(font_large.render("G", True, GREEN), (cx - 25, cy - 45))
                     else:
                         screen.blit(font_large.render("R", True, RED), (cx - 30, cy - 45))
+            
+            # replay button
+            replay_btn = pygame.Rect(150, 20, 130, 40)
+            pygame.draw.rect(screen, GREEN, replay_btn, border_radius=5)
+            screen.blit(font_label.render("Replay", True, WHITE), (165, 25))
+
 
         back_btn = pygame.Rect(20, 20, 100, 40)
         pygame.draw.rect(screen, RED, back_btn, border_radius=5)
@@ -133,6 +139,12 @@ def play_game3(screen):
                         running_state = STATE_SETUP
                     else:
                         return  
+                
+                if running_state == STATE_PLAYING and replay_btn.collidepoint(m_pos):
+                    board = [0] * 9
+                    ui_board = [0] * 9
+                    turn = "Player" if not pvp else "Green"
+                    winner, pc_move_msg = None, ""
 
                 if running_state == STATE_SETUP:
                     if pygame.Rect(250, 200, 220, 60).collidepoint(m_pos): pvp = False
