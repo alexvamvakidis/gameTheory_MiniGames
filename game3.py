@@ -42,7 +42,7 @@ def get_nim_value(board, memo, gameType):
 def play_game3(screen):
     WIDTH, HEIGHT = screen.get_size()
     font_title = pygame.font.SysFont("arial", 55, bold=True)
-    font_sub = pygame.font.SysFont("arial", 40, bold=True)
+    font_sub = pygame.font.SysFont("arial", 40, italic=True)
     font_button = pygame.font.SysFont("arial", 34, bold=True)
     font_label = pygame.font.SysFont("arial", 32)
     font_large = pygame.font.SysFont("arial", 80, bold=True)
@@ -61,10 +61,19 @@ def play_game3(screen):
     pc_move_msg = ""
     computer_thinking_start = 0
 
+    replay_btn = pygame.Rect(150, 20, 130, 40)
+    back_btn = pygame.Rect(20, 20, 100, 40)
+
+    #grid settings
+    start_x = WIDTH // 2 - 150
+    start_y = 220
+    cell_size = 100
+
     clock = pygame.time.Clock()
     running = True
 
     while running:
+        hover = False
         screen.fill(WHITE)
         m_pos = pygame.mouse.get_pos()
 
@@ -91,40 +100,41 @@ def play_game3(screen):
             screen.blit(font_button.render("START GAME", True, WHITE), (390, 520))
 
         elif running_state == STATE_PLAYING:
-            info_txt = f"{turn}'s turn!" if not winner else f"WINNER: {winner}!"
-            screen.blit(font_sub.render(info_txt, True, BLUE), (WIDTH//2 - 130, 80))
+            if winner: 
+                info_txt = f"WINNER: {winner}!" 
+                txt = font_title.render(info_txt, True, BLACK)
+                screen.blit(txt, txt.get_rect(center=(WIDTH//2, 400 )))
+            else: 
+                info_txt = f"{turn}'s turn!"
+                txt = font_sub.render(info_txt, True, BLUE)
+                screen.blit(txt, txt.get_rect(center=(WIDTH//2, 90 )))
 
             if pc_move_msg:
                 color = GRAY if "thinking" in pc_move_msg else RED
                 screen.blit(font_label.render(pc_move_msg, True, color), (WIDTH//2 - 150, 130))
 
             # draw grid
-            start_x = WIDTH // 2 - 150
-            start_y = 220
-            cell_size = 100
+            if not winner:
+                for i in range(1, 3):
+                    pygame.draw.line(screen, BLACK, (start_x + i * cell_size, start_y), (start_x + i * cell_size, start_y + 300), 5)
+                    pygame.draw.line(screen, BLACK, (start_x, start_y + i * cell_size), (start_x + 300, start_y + i * cell_size), 5)
 
-            for i in range(1, 3):
-                pygame.draw.line(screen, BLACK, (start_x + i * cell_size, start_y), (start_x + i * cell_size, start_y + 300), 5)
-                pygame.draw.line(screen, BLACK, (start_x, start_y + i * cell_size), (start_x + 300, start_y + i * cell_size), 5)
-
-            # draw marks
-            for i in range(9):
-                if ui_board[i] != 0:
-                    row, col = divmod(i, 3)
-                    cx = start_x + col * cell_size + cell_size // 2
-                    cy = start_y + row * cell_size + cell_size // 2
-                    if ui_board[i] == 1:
-                        screen.blit(font_large.render("G", True, GREEN), (cx - 25, cy - 45))
-                    else:
-                        screen.blit(font_large.render("R", True, RED), (cx - 30, cy - 45))
-            
+                # draw marks
+                for i in range(9):
+                    if ui_board[i] != 0:
+                        row, col = divmod(i, 3)
+                        cx = start_x + col * cell_size + cell_size // 2
+                        cy = start_y + row * cell_size + cell_size // 2
+                        if ui_board[i] == 1:
+                            screen.blit(font_large.render("G", True, GREEN), (cx - 30, cy - 40))
+                        else:
+                            screen.blit(font_large.render("R", True, RED), (cx - 30, cy - 40))
+                
             # replay button
-            replay_btn = pygame.Rect(150, 20, 130, 40)
             pygame.draw.rect(screen, GREEN, replay_btn, border_radius=5)
             screen.blit(font_label.render("Replay", True, WHITE), (165, 25))
 
-
-        back_btn = pygame.Rect(20, 20, 100, 40)
+        #back button
         pygame.draw.rect(screen, RED, back_btn, border_radius=5)
         screen.blit(font_label.render("Back", True, WHITE), (35, 25))
 
@@ -214,6 +224,21 @@ def play_game3(screen):
                     winner = "Computer" if classic else "Player"
                 else:
                     turn = "Player"
+        if running_state == STATE_SETUP:
+            if pvc_btn.collidepoint(m_pos) or pvp_btn.collidepoint(m_pos) or classic_btn.collidepoint(m_pos) or misere_btn.collidepoint(m_pos) or start_btn.collidepoint(m_pos) or back_btn.collidepoint(m_pos):
+                hover = True
+            else:                  
+                hover = False
+        elif running_state == STATE_PLAYING:
+            if replay_btn.collidepoint(m_pos) or back_btn.collidepoint(m_pos)\
+                or (not winner and turn != "Computer" and any(pygame.Rect(start_x + i*cell_size, start_y + j*cell_size, cell_size, cell_size).collidepoint(m_pos) for i in range(3) for j in range(3))):
+                hover = True
+            else:
+                hover = False
+        if hover:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)  
+        else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         pygame.display.flip()
         clock.tick(60)

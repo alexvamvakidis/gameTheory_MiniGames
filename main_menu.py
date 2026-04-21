@@ -12,7 +12,9 @@ pygame.init()
 # Ρυθμίσεις οθόνης
 WIDTH, HEIGHT = 1000, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Game Theory - Mini Games")
+pygame.display.set_caption("Made with Pygame")
+
+
 
 # Χρώματα
 WHITE = (245, 245, 245)
@@ -22,6 +24,7 @@ BLUE = (50, 100, 200)
 TEXT_COLOR = (255, 255, 255)
 
 font_title = pygame.font.SysFont("arial", 50, bold=True)
+font_sub = pygame.font.SysFont("arial", 40,  italic=True)
 font_button = pygame.font.SysFont("arial", 35, bold=True)
 
 button_w, button_h = 400, 250
@@ -40,11 +43,13 @@ buttons = [
 def draw_menu():
     screen.fill(WHITE)
     
-    
-    title_surface = font_title.render("Select game", True, BLACK)
-    title_rect = title_surface.get_rect(center=(WIDTH // 2, 80))
-    screen.blit(title_surface, title_rect)
-    
+    title = font_title.render("Game Theory - Mini Games", True, BLACK)
+    title_rect = title.get_rect(center=(WIDTH // 2, 40))
+    subtitle_surface = font_sub.render("Select one of the games below:", True, BLACK)
+    subtitle_rect = subtitle_surface.get_rect(center=(WIDTH // 2, 100))
+    screen.blit(title, title_rect)
+    screen.blit(subtitle_surface, subtitle_rect)
+
     for btn in buttons:
         shadow_rect = btn["rect"].copy()
         shadow_rect.x += 4
@@ -60,6 +65,7 @@ def draw_menu():
 def main():
     running = True
     while running:
+        hover = False
         draw_menu()
         
         for event in pygame.event.get():
@@ -78,6 +84,19 @@ def main():
                             game3.play_game3(screen)
                         elif btn["id"] == 4:
                             game4.play_game4(screen)
+                    
+        if buttons[0]["rect"].collidepoint(pygame.mouse.get_pos()) or \
+           buttons[1]["rect"].collidepoint(pygame.mouse.get_pos()) or \
+           buttons[2]["rect"].collidepoint(pygame.mouse.get_pos()) or \
+           buttons[3]["rect"].collidepoint(pygame.mouse.get_pos()):
+            hover = True
+        else:
+            hover = False
+
+        if hover:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                         
         pygame.display.flip()
 
