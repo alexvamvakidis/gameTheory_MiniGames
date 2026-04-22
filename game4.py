@@ -9,16 +9,13 @@ RED = (200, 50, 50)
 GREEN = (50, 180, 50)
 
 def is_game_over(board):
-    return ((board[0] == 1 and board[1] == 1 and board[2] == 1 and board[3] == 1) or 
-            (board[4] == 1 and board[5] == 1 and board[6] == 1 and board[7] == 1) or 
-            (board[8] == 1 and board[9] == 1 and board[10] == 1 and board[11] == 1) or 
-            (board[12] == 1 and board[13] == 1 and board[14] == 1 and board[15] == 1) or 
-            (board[0] == 1 and board[4] == 1 and board[8] == 1 and board[12] == 1) or 
-            (board[1] == 1 and board[5] == 1 and board[9] == 1 and board[13] == 1) or 
-            (board[2] == 1 and board[6] == 1 and board[10] == 1 and board[14] == 1) or
-            (board[3] == 1 and board[7] == 1 and board[11] == 1 and board[15] == 1) or # Διόρθωση 4ης στήλης
-            (board[0] == 1 and board[5] == 1 and board[10] == 1 and board[15] == 1) or
-            (board[3] == 1 and board[6] == 1 and board[9] == 1 and board[12] == 1))
+    wins = [(0,1,2,3), (4,5,6,7), (8,9,10,11), (12,13,14,15),
+            (0,4,8,12), (1,5,9,13), (2,6,10,14), (3,7,11,15),
+            (0,5,10,15), (3,6,9,12)]
+    for a, b, c, d in wins:
+        if board[a] == board[b] == board[c] == board[d] == 1:
+            return True, [a, b, c, d]
+    return False
 
 def get_nim_value(board, memo):
     state = tuple(board)
@@ -98,8 +95,8 @@ def play_game4(screen):
         elif running_state == STATE_PLAYING:
             if winner: 
                 info_txt = f"WINNER: {winner}!" 
-                txt = font_title.render(info_txt, True, BLACK)
-                screen.blit(txt, txt.get_rect(center=(WIDTH//2, 400 )))
+                txt = font_sub.render(info_txt, True, BLACK)
+                screen.blit(txt, txt.get_rect(center=(WIDTH//2, 90 )))
             else: 
                 info_txt = f"{turn}'s turn!"
                 txt = font_sub.render(info_txt, True, BLUE)
@@ -111,21 +108,21 @@ def play_game4(screen):
                 screen.blit(font_label.render(pc_move_msg, True, color), (WIDTH//2 - 150, 110))
 
             # grid 4x4
-            if not winner:
-                for i in range(1, 4):
-                    pygame.draw.line(screen, BLACK, (start_x + i * cell_size, start_y), (start_x + i * cell_size, start_y + grid_size), 5)
-                    pygame.draw.line(screen, BLACK, (start_x, start_y + i * cell_size), (start_x + grid_size, start_y + i * cell_size), 5)
+            
+            for i in range(1, 4):
+                pygame.draw.line(screen, BLACK, (start_x + i * cell_size, start_y), (start_x + i * cell_size, start_y + grid_size), 5)
+                pygame.draw.line(screen, BLACK, (start_x, start_y + i * cell_size), (start_x + grid_size, start_y + i * cell_size), 5)
 
-                # marks
-                for i in range(16):
-                    if ui_board[i] != 0:
-                        row, col = divmod(i, 4)
-                        cx = start_x + col * cell_size + cell_size // 2
-                        cy = start_y + row * cell_size + cell_size // 2
-                        if ui_board[i] == 1:
-                            screen.blit(font_large.render("G", True, GREEN), (cx - 20, cy - 30))
-                        else:
-                            screen.blit(font_large.render("R", True, RED), (cx - 20, cy - 30))
+        # marks
+            for i in range(16):
+                if ui_board[i] != 0:
+                    row, col = divmod(i, 4)
+                    cx = start_x + col * cell_size + cell_size // 2
+                    cy = start_y + row * cell_size + cell_size // 2
+                    if ui_board[i] == 1:
+                        screen.blit(font_large.render("G", True, GREEN), (cx - 20, cy - 30))
+                    else:
+                        screen.blit(font_large.render("R", True, RED), (cx - 20, cy - 30))
                 
             # replay button
             pygame.draw.rect(screen, GREEN, replay_btn, border_radius=5)
@@ -222,6 +219,32 @@ def play_game4(screen):
                     winner = "Draw"
                 else:
                     turn = "Player"
+        if running_state == STATE_PLAYING and winner:
+            win_cells = is_game_over(board)[1]
+            x1 = start_x + (win_cells[0] % 4) * cell_size + cell_size // 2
+            y1 = start_y + (win_cells[0] // 4) * cell_size + cell_size // 2
+            x2 = start_x + (win_cells[3] % 4) * cell_size + cell_size // 2
+            y2 = start_y + (win_cells[3] // 4) * cell_size + cell_size // 2
+
+            ext = 40 
+            diff = win_cells[1] - win_cells[0] 
+            if diff == 1:   
+                x1 -= ext   
+                x2 += ext   
+                
+            elif diff == 4: 
+                y1 -= ext   
+                y2 += ext   
+                
+            elif diff == 5: 
+                x1 -= ext; y1 -= ext
+                x2 += ext; y2 += ext
+                
+            elif diff == 3: 
+                x1 += ext; y1 -= ext
+                x2 -= ext; y2 += ext
+                            
+            pygame.draw.line(screen, BLACK, (x1, y1), (x2, y2), 10) 
         if running_state == STATE_SETUP:
             if pvc_btn.collidepoint(m_pos) or pvp_btn.collidepoint(m_pos) or start_btn.collidepoint(m_pos) or back_btn.collidepoint(m_pos):
                 hover = True
